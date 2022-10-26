@@ -18,8 +18,21 @@ const express_1 = __importDefault(require("express"));
 // import SellerHandler from './routes/sellerHandler';
 const app = (0, express_1.default)();
 const port = process.env.PORT || 4000;
+var allowedOrigins = ['http://localhost:4000',
+    'https://programming-spot.vercel.app/'];
 app.use((0, cors_1.default)({
-    origin: '*'
+    origin: function (origin, callback) {
+        // allow requests with no origin 
+        // (like mobile apps or curl requests)
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            var msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    }
 }));
 app.get('/auth', (req, res) => (0, auth_1.default)(req, res));
 app.get('/services', (req, res) => (0, services_1.default)(req, res));
