@@ -1,0 +1,1 @@
+{"version":3,"file":"insufficientHeaders.js","sourceRoot":"","sources":["../../src/hooks/insufficientHeaders.ts"],"names":[],"mappings":";;AAIA,SAAwB,mBAAmB,CAAE,GAA8B,EAAE,GAAa;IACtF,OAAO,GAAG,CAAC,MAAM,CAAC,GAAG,CAAC,CAAC,IAAI,CAAC;QACxB,KAAK,EAAE,sBAAsB;QAC7B,OAAO,EAAE,sBAAsB;KAClC,CAAC,CAAA;AACN,CAAC;AALD,sCAKC"}
