@@ -73,6 +73,10 @@ function AuthHandler(req, res) {
                     return res.status(200).json(result.toObject());
                 });
                 break;
+            case "get":
+                if (!headers.id)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                break;
         }
     });
 }

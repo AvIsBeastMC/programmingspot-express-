@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AccountSchema_1 = __importDefault(require("../schemas/AccountSchema"));
+const OrderSchema_1 = __importDefault(require("../schemas/OrderSchema"));
 const ServiceSchema_1 = __importDefault(require("../schemas/ServiceSchema"));
 const connection_1 = __importDefault(require("../hooks/connection"));
 const handleError_1 = __importDefault(require("../hooks/handleError"));
@@ -64,9 +65,16 @@ function OrderHandler(req, res) {
                                         $inc: {
                                             orders: +1
                                         }
-                                    }).exec((error) => {
-                                        return res.end('Success');
-                                    });
+                                    }).exec((error) => __awaiter(this, void 0, void 0, function* () {
+                                        if (error)
+                                            return handleAnError(req, res, error);
+                                        yield OrderSchema_1.default.create({
+                                            by: account._id.toString(),
+                                            service: Object.assign(Object.assign({}, service.toObject()), { _id: service._id.toString() }),
+                                            purchasedOn: new Date()
+                                        });
+                                        return res.end("Success!");
+                                    }));
                                 });
                                 return res.end("Success");
                             }

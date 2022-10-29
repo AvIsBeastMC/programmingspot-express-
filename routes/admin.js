@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AccountSchema_1 = __importDefault(require("../schemas/AccountSchema"));
+const OrderSchema_1 = __importDefault(require("../schemas/OrderSchema"));
 const ServiceSchema_1 = __importDefault(require("../schemas/ServiceSchema"));
 const connection_1 = __importDefault(require("../hooks/connection"));
 const handleError_1 = __importDefault(require("../hooks/handleError"));
@@ -93,25 +94,125 @@ function AdminHandler(req, res) {
                     if (error)
                         return (0, handleError_1.default)(req, res, {
                             type: "server",
-                            message: error.message
+                            message: error.message,
                         });
                     if (result) {
                         result.update(modifyPayload).exec((error) => {
                             if (error)
                                 return (0, handleError_1.default)(req, res, {
                                     type: "server",
-                                    message: error.message
+                                    message: error.message,
                                 });
                             return res.status(200).end("Success");
                         });
                     }
                     else {
                         return (0, handleError_1.default)(req, res, {
-                            type: 'server',
-                            message: "No service with this ID exists..."
+                            type: "server",
+                            message: "No service with this ID exists...",
                         });
                     }
                 });
+                break;
+            case "grantAdmin":
+                if (!headers.email)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                AccountSchema_1.default.findOne({
+                    email: headers.email,
+                }).exec((error, result) => {
+                    if (error)
+                        (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    if (result) {
+                        result
+                            .updateOne({
+                            $set: {
+                                isAdmin: true,
+                            },
+                        })
+                            .exec((error, result) => {
+                            if (error)
+                                (0, handleError_1.default)(req, res, {
+                                    type: "server",
+                                    message: error.message,
+                                });
+                            return res.status(200).end("Success");
+                        });
+                    }
+                    else {
+                        return (0, handleError_1.default)(req, res, {
+                            type: "client",
+                            message: "No Such Account Exists",
+                        });
+                    }
+                });
+                break;
+            case "revokeAdmin":
+                if (!headers.email)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                AccountSchema_1.default.findOne({
+                    email: headers.email,
+                }).exec((error, result) => {
+                    if (error)
+                        (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    if (result) {
+                        result
+                            .updateOne({
+                            $set: {
+                                isAdmin: false,
+                            },
+                        })
+                            .exec((error, result) => {
+                            if (error)
+                                (0, handleError_1.default)(req, res, {
+                                    type: "server",
+                                    message: error.message,
+                                });
+                            return res.status(200).end("Success");
+                        });
+                    }
+                    else {
+                        return (0, handleError_1.default)(req, res, {
+                            type: "client",
+                            message: "No Such Account Exists",
+                        });
+                    }
+                });
+                break;
+            case "getOrders":
+                OrderSchema_1.default.find()
+                    .sort({ purchasedOn: -1 })
+                    .exec((error, orders) => {
+                    if (error)
+                        return (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    return res.status(200).json(orders);
+                });
+                break;
+            case "deleteService":
+                if (!headers.id)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                ServiceSchema_1.default.findById(headers.id).exec((error, service) => __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        return (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    if (service) {
+                        yield service.delete();
+                        return res.status(200).end("Success!");
+                    }
+                    else {
+                        return res.status(200).end("Success!");
+                    }
+                }));
                 break;
         }
     });
