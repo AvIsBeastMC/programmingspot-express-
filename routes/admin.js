@@ -214,6 +214,91 @@ function AdminHandler(req, res) {
                     }
                 }));
                 break;
+            case "addLesson":
+                if (!headers.id ||
+                    !headers.title ||
+                    !headers.description ||
+                    !headers.video ||
+                    !headers.points)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                const ServiceRef = ServiceSchema_1.default.findById(headers.id);
+                ServiceRef.exec((error, service) => {
+                    if (error)
+                        return (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    if (service) {
+                        function makeid(length) {
+                            var result = "";
+                            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                            var charactersLength = characters.length;
+                            for (var i = 0; i < length; i++) {
+                                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                            }
+                            return result;
+                        }
+                        service
+                            .updateOne({
+                            $push: {
+                                lessons: {
+                                    id: makeid(10),
+                                    title: headers.title,
+                                    description: headers.description,
+                                    videoUrl: headers.video,
+                                    points: JSON.parse(headers.points),
+                                    dateCreated: new Date(),
+                                },
+                            },
+                        })
+                            .exec((error) => {
+                            if (error) {
+                                (0, handleError_1.default)(req, res, {
+                                    type: "server",
+                                    message: error.message,
+                                });
+                                console.log(error);
+                                return;
+                            }
+                            return res.status(200).end("Success");
+                        });
+                    }
+                    else {
+                        return (0, handleError_1.default)(req, res, {
+                            type: "client",
+                            message: "No Such Service Exists"
+                        });
+                    }
+                });
+                break;
+            case "deleteLesson":
+                if (!headers.id || !headers._id)
+                    return (0, insufficientHeaders_1.default)(req, res);
+                // id is Service ID _id is Lesson.id
+                ServiceSchema_1.default.findById(headers.id).exec((error, service) => {
+                    if (error)
+                        (0, handleError_1.default)(req, res, {
+                            type: "server",
+                            message: error.message
+                        });
+                    if (service) {
+                        service.updateOne({
+                            $pull: {
+                                lessons: {
+                                    id: headers._id
+                                }
+                            }
+                        }).exec((error) => {
+                            if (error)
+                                return (0, handleError_1.default)(req, res, {
+                                    type: "server",
+                                    message: error.message
+                                });
+                            res.status(200).end("Success");
+                        });
+                    }
+                });
+                break;
         }
     });
 }

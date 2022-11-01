@@ -1,10 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const ServiceSchema = new mongoose_1.default.Schema({
+const mongoose_1 = require("mongoose");
+const ServiceSchema = new mongoose_1.Schema({
     name: String,
     titleImage: String,
     createdOn: String,
@@ -16,10 +13,12 @@ const ServiceSchema = new mongoose_1.default.Schema({
             title: String,
             description: String,
             videoUrl: String,
-            points: String,
+            points: [String],
+            dateCreated: Date,
+            id: String
         }
     ],
-    points: Array,
+    points: [String],
 });
-exports.default = mongoose_1.default.model("service", ServiceSchema);
+exports.default = (0, mongoose_1.model)("service", ServiceSchema);
 //# sourceMappingURL=ServiceSchema.js.map
